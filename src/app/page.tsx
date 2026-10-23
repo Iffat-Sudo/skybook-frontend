@@ -6,15 +6,15 @@ export default function Home() {
   const { data: flights, isPending, isError, error } = useFlights();
 
   if (isPending) {
-    return <p className="p-8 text-neutral-600">Loading flights...</p>;
+    return <p className="text-neutral-600">Loading flights...</p>;
   }
 
   if (isError) {
-    return <p className="p-8 text-error-600">Error: {error.message}</p>;
+    return <p className="text-error-600">Error: {error.message}</p>;
   }
 
   return (
-    <main className="mx-auto max-w-3xl space-y-4 p-8">
+    <div className="space-y-4">
       <h1 className="text-h1 text-primary-900">Flights ({flights.length})</h1>
 
       {flights.map((flight) => (
@@ -27,6 +27,6 @@ export default function Home() {
           </p>
         </div>
       ))}
-    </main>
+    </div>
   );
 }
