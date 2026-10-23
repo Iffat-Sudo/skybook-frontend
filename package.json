@@ -10,6 +10,7 @@
     "gen:api": "openapi-typescript http://localhost:8080/v3/api-docs -o src/lib/api/schema.d.ts"
   },
   "dependencies": {
+    "@tanstack/react-query": "^5.104.5",
     "next": "16.4.2",
     "react": "19.3.0",
     "react-dom": "19.3.0"
