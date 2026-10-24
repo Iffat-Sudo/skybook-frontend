@@ -1,6 +1,7 @@
 "use client";
 
 import { useFlights } from "@/hooks/useFlights";
+import { formatDate, formatPrice, formatTime } from "@/lib/format";
 
 export default function Home() {
   const { data: flights, isPending, isError, error } = useFlights();
@@ -23,7 +24,9 @@ export default function Home() {
             {flight.flightNumber} → {flight.destination}
           </p>
           <p className="text-small text-neutral-600">
-            {flight.departureTime} · {flight.status} · €{flight.price}
+            {formatDate(flight.departureTime)} ·{" "}
+            {formatTime(flight.departureTime)} · {flight.status} ·{" "}
+            {formatPrice(flight.price)}
           </p>
         </div>
       ))}
