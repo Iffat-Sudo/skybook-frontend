@@ -1,35 +1,14 @@
-"use client";
-
-import { useFlights } from "@/hooks/useFlights";
-import { formatDate, formatPrice, formatTime } from "@/lib/format";
+import SearchForm from "@/components/SearchForm";
 
 export default function Home() {
-  const { data: flights, isPending, isError, error } = useFlights();
-
-  if (isPending) {
-    return <p className="text-neutral-600">Loading flights...</p>;
-  }
-
-  if (isError) {
-    return <p className="text-error-600">Error: {error.message}</p>;
-  }
-
   return (
-    <div className="space-y-4">
-      <h1 className="text-h1 text-primary-900">Flights ({flights.length})</h1>
+    <div className="space-y-6">
+      <div className="space-y-1">
+        <h1 className="text-h2 text-neutral-900 md:text-h1">Find your flight</h1>
+        <p className="text-small text-neutral-600">Search and book flights in a few clicks</p>
+      </div>
 
-      {flights.map((flight) => (
-        <div key={flight.id} className="rounded-lg bg-white p-4 shadow-card">
-          <p className="text-h3">
-            {flight.flightNumber} → {flight.destination}
-          </p>
-          <p className="text-small text-neutral-600">
-            {formatDate(flight.departureTime)} ·{" "}
-            {formatTime(flight.departureTime)} · {flight.status} ·{" "}
-            {formatPrice(flight.price)}
-          </p>
-        </div>
-      ))}
+      <SearchForm />
     </div>
   );
 }
