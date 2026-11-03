@@ -2,13 +2,25 @@ import type { components } from "./schema";
 
 type Schemas = components["schemas"];
 
-// Flights
-export type FlightListItem = Schemas["FlightListDTO"];
-export type AvailableFlight = Schemas["AvailableFlightDTO"];
+// Our backend always sends every field of these objects.
+// Swagger marks them as "optional", so we tell TypeScript they are always there.
+type DeepRequired<T> = {
+  [K in keyof T]-?: T[K] extends object ? DeepRequired<T[K]> : T[K];
+};
 
-// Booking
+// Flights and airports
+export type Airport = DeepRequired<Schemas["AirportDTO"]>;
+export type Flight = DeepRequired<Schemas["FlightDTO"]>;
+
+// Bookings (Phase 2)
+export type Booking = DeepRequired<Schemas["BookingDTO"]>;
 export type BookFlightRequest = Schemas["BookFlightRequestDTO"];
-export type FlightBooking = Schemas["FlightBookingDTO"];
+
+// Login (Phase 2)
+export type User = DeepRequired<Schemas["UserDTO"]>;
+export type AuthResponse = DeepRequired<Schemas["AuthResponseDTO"]>;
+export type LoginRequest = Schemas["LoginRequestDTO"];
+export type RegisterRequest = Schemas["RegisterRequestDTO"];
 
 // Chatbot (Phase 5)
 export type ChatRequest = Schemas["AIRequestDTO"];

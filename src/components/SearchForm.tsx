@@ -2,9 +2,10 @@
 
 import { useRouter } from "next/navigation";
 import { useState, type FormEvent } from "react";
-import { useAvailableFlights } from "@/hooks/useAvailableFlights";
+import { useAirports } from "@/hooks/useAirports";
 
 type SearchFormProps = {
+  initialFrom?: string;
   initialTo?: string;
   initialDate?: string;
   initialPassengers?: string;
@@ -19,25 +20,31 @@ const labelClass = "flex flex-col gap-1";
 const labelTextClass = "text-caption text-neutral-600";
 
 export default function SearchForm({
+  initialFrom = "ARN",
   initialTo = "",
   initialDate = "",
   initialPassengers = "1",
 }: SearchFormProps) {
   const router = useRouter();
-  const { data: flights, isPending } = useAvailableFlights();
+  const { data: airports = [], isPending } = useAirports();
 
+  const [from, setFrom] = useState(initialFrom);
   const [to, setTo] = useState(initialTo);
   const [date, setDate] = useState(initialDate);
   const [passengers, setPassengers] = useState(initialPassengers);
 
-  // All cities in the data, each one only once, A to Z
-  const destinations = [...new Set(flights?.map((flight) => flight.destination))].sort();
+  function handleFromChange(code: string) {
+    setFrom(code);
+    if (code === to) setTo(""); // you can't fly to the same airport
+  }
 
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    const params = new URLSearchParams({ to, date, passengers });
+    const params = new URLSearchParams({ from, to, date, passengers });
     router.push(`/results?${params.toString()}`);
   }
+
+  const placeholder = isPending ? "Loading..." : "Choose an airport";
 
   return (
     <form
@@ -46,7 +53,22 @@ export default function SearchForm({
     >
       <label className={labelClass}>
         <span className={labelTextClass}>From</span>
-        <input className={fieldClass} value="Stockholm (ARN)" disabled />
+        <select
+          className={fieldClass}
+          value={from}
+          onChange={(event) => handleFromChange(event.target.value)}
+          disabled={isPending}
+          required
+        >
+          <option value="" disabled>
+            {placeholder}
+          </option>
+          {airports.map((airport) => (
+            <option key={airport.code} value={airport.code}>
+              {airport.city} ({airport.code})
+            </option>
+          ))}
+        </select>
       </label>
 
       <label className={labelClass}>
@@ -59,13 +81,15 @@ export default function SearchForm({
           required
         >
           <option value="" disabled>
-            {isPending ? "Loading..." : "Choose a city"}
+            {placeholder}
           </option>
-          {destinations.map((city) => (
-            <option key={city} value={city}>
-              {city}
-            </option>
-          ))}
+          {airports
+            .filter((airport) => airport.code !== from)
+            .map((airport) => (
+              <option key={airport.code} value={airport.code}>
+                {airport.city} ({airport.code})
+              </option>
+            ))}
         </select>
       </label>
 

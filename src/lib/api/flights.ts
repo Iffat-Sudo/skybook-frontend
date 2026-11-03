@@ -1,10 +1,24 @@
 import { apiGet } from "./client";
-import type { AvailableFlight, FlightListItem } from "./types";
+import type { Airport, Flight } from "./types";
 
-export function getFlights() {
-  return apiGet<FlightListItem[]>("/api/flights");
+export type FlightSearchParams = {
+  from?: string;
+  to?: string;
+  date?: string;
+  maxPrice?: number;
+};
+
+export function getAirports() {
+  return apiGet<Airport[]>("/api/airports");
 }
 
-export function getAvailableFlights() {
-  return apiGet<AvailableFlight[]>("/api/flights/available");
+export function searchFlights(params: FlightSearchParams) {
+  const query = new URLSearchParams();
+  if (params.from) query.set("from", params.from);
+  if (params.to) query.set("to", params.to);
+  if (params.date) query.set("date", params.date);
+  if (params.maxPrice !== undefined) query.set("maxPrice", String(params.maxPrice));
+
+  const queryString = query.toString();
+  return apiGet<Flight[]>(`/api/flights/search${queryString ? `?${queryString}` : ""}`);
 }

@@ -15,7 +15,7 @@ export interface paths {
         put?: never;
         /**
          * Book a flight
-         * @description Books a flight for a passenger
+         * @description Books one seat. Needs login.
          */
         post: operations["bookFlight"];
         delete?: never;
@@ -40,6 +40,46 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/auth/register": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Register a new user
+         * @description Creates a user and returns a JWT token
+         */
+        post: operations["register"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/auth/login": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Log in
+         * @description Returns a JWT token
+         */
+        post: operations["login"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/flights": {
         parameters: {
             query?: never;
@@ -48,10 +88,10 @@ export interface paths {
             cookie?: never;
         };
         /**
-         * Get all flights
-         * @description Returns a list of all flights
+         * Get upcoming flights
+         * @description Returns all flights in the future
          */
-        get: operations["getAllFlights"];
+        get: operations["getUpcomingFlights"];
         put?: never;
         post?: never;
         delete?: never;
@@ -60,7 +100,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/flights/bookings": {
+    "/api/flights/search": {
         parameters: {
             query?: never;
             header?: never;
@@ -68,10 +108,10 @@ export interface paths {
             cookie?: never;
         };
         /**
-         * Get bookings by email
-         * @description Returns all bookings for a given email
+         * Search flights
+         * @description All filters are optional
          */
-        get: operations["getBookingsByEmail"];
+        get: operations["searchFlights"];
         put?: never;
         post?: never;
         delete?: never;
@@ -89,7 +129,7 @@ export interface paths {
         };
         /**
          * Get available flights
-         * @description Returns a list of all available flights
+         * @description Returns future flights with free seats
          */
         get: operations["getAvailableFlights"];
         put?: never;
@@ -100,7 +140,64 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/flights/{flightId}/cancel": {
+    "/api/bookings": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * My bookings
+         * @description Returns the bookings of the logged-in user
+         */
+        get: operations["getMyBookings"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/auth/me": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get the logged-in user */
+        get: operations["me"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/airports": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get all airports
+         * @description Returns all airports, sorted by city
+         */
+        get: operations["getAirports"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/bookings/{bookingId}": {
         parameters: {
             query?: never;
             header?: never;
@@ -111,10 +208,10 @@ export interface paths {
         put?: never;
         post?: never;
         /**
-         * Cancel a flight booking
-         * @description Cancels a flight booking for a given flight ID and email
+         * Cancel a booking
+         * @description Cancels one of your bookings and gives the seat back
          */
-        delete: operations["cancelFlight"];
+        delete: operations["cancelBooking"];
         options?: never;
         head?: never;
         patch?: never;
@@ -124,25 +221,47 @@ export interface paths {
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
-        /** @description Booking request details */
         BookFlightRequestDTO: {
             passengerName: string;
             passengerEmail: string;
         };
-        FlightBookingDTO: {
+        AirportDTO: {
             /** Format: int64 */
             id?: number;
-            flightNumber: string;
-            passengerName: string;
-            passengerEmail: string;
-            /** Format: date-time */
-            departureTime: string;
-            /** Format: date-time */
-            arrivalTime: string;
-            status: string;
-            destination: string;
+            code?: string;
+            name?: string;
+            city?: string;
+            country?: string;
             /** Format: double */
+            latitude?: number;
+            /** Format: double */
+            longitude?: number;
+        };
+        BookingDTO: {
+            /** Format: int64 */
+            id?: number;
+            flight?: components["schemas"]["FlightDTO"];
+            passengerName?: string;
+            passengerEmail?: string;
+            status?: string;
+            /** Format: date-time */
+            bookedAt?: string;
+        };
+        FlightDTO: {
+            /** Format: int64 */
+            id?: number;
+            flightNumber?: string;
+            departureAirport?: components["schemas"]["AirportDTO"];
+            arrivalAirport?: components["schemas"]["AirportDTO"];
+            /** Format: date-time */
+            departureTime?: string;
+            /** Format: date-time */
+            arrivalTime?: string;
             price?: number;
+            /** Format: int32 */
+            availableSeats?: number;
+            /** Format: int32 */
+            totalSeats?: number;
         };
         AIRequestDTO: {
             message?: string;
@@ -150,30 +269,26 @@ export interface components {
         AIResponseDTO: {
             message?: string;
         };
-        FlightListDTO: {
-            /** Format: int64 */
-            id?: number;
-            flightNumber: string;
-            /** Format: date-time */
-            departureTime: string;
-            /** Format: date-time */
-            arrivalTime: string;
-            status: string;
-            destination: string;
-            /** Format: double */
-            price?: number;
+        RegisterRequestDTO: {
+            name: string;
+            email: string;
+            password: string;
         };
-        AvailableFlightDTO: {
+        AuthResponseDTO: {
+            token?: string;
+            /** Format: date-time */
+            expiresAt?: string;
+            user?: components["schemas"]["UserDTO"];
+        };
+        UserDTO: {
             /** Format: int64 */
             id?: number;
-            flightNumber: string;
-            /** Format: date-time */
-            departureTime: string;
-            /** Format: date-time */
-            arrivalTime: string;
-            destination: string;
-            /** Format: double */
-            price?: number;
+            name?: string;
+            email?: string;
+        };
+        LoginRequestDTO: {
+            email: string;
+            password: string;
         };
     };
     responses: never;
@@ -201,16 +316,23 @@ export interface operations {
         };
         responses: {
             /** @description Flight successfully booked */
-            200: {
+            201: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "*/*": components["schemas"]["FlightBookingDTO"];
+                    "*/*": components["schemas"]["BookingDTO"];
                 };
             };
-            /** @description Flight not available */
+            /** @description Flight full or already departed */
             400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Not logged in */
+            401: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -249,7 +371,55 @@ export interface operations {
             };
         };
     };
-    getAllFlights: {
+    register: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["RegisterRequestDTO"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["AuthResponseDTO"];
+                };
+            };
+        };
+    };
+    login: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["LoginRequestDTO"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["AuthResponseDTO"];
+                };
+            };
+        };
+    };
+    getUpcomingFlights: {
         parameters: {
             query?: never;
             header?: never;
@@ -258,22 +428,28 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
-            /** @description Successfully retrieved all flights */
+            /** @description OK */
             200: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "*/*": components["schemas"]["FlightListDTO"][];
+                    "*/*": components["schemas"]["FlightDTO"][];
                 };
             };
         };
     };
-    getBookingsByEmail: {
+    searchFlights: {
         parameters: {
-            query: {
-                /** @description Email to search bookings for */
-                email: string;
+            query?: {
+                /** @description Departure airport code, e.g. ARN */
+                from?: string;
+                /** @description Arrival airport code, e.g. LHR */
+                to?: string;
+                /** @description Departure date, e.g. 2026-11-12 */
+                date?: string;
+                /** @description Highest price, e.g. 300 */
+                maxPrice?: number;
             };
             header?: never;
             path?: never;
@@ -281,13 +457,13 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
-            /** @description Successfully retrieved bookings */
+            /** @description OK */
             200: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "*/*": components["schemas"]["FlightBookingDTO"][];
+                    "*/*": components["schemas"]["FlightDTO"][];
                 };
             };
         };
@@ -301,47 +477,111 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
-            /** @description Successfully retrieved available flights */
+            /** @description OK */
             200: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "*/*": components["schemas"]["AvailableFlightDTO"][];
+                    "*/*": components["schemas"]["FlightDTO"][];
                 };
             };
         };
     };
-    cancelFlight: {
+    getMyBookings: {
         parameters: {
-            query: {
-                /** @description Email associated with the booking */
-                email: string;
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["BookingDTO"][];
+                };
             };
+        };
+    };
+    me: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["UserDTO"];
+                };
+            };
+        };
+    };
+    getAirports: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["AirportDTO"][];
+                };
+            };
+        };
+    };
+    cancelBooking: {
+        parameters: {
+            query?: never;
             header?: never;
             path: {
-                /** @description ID of the flight to cancel */
-                flightId: number;
+                /** @description ID of the booking to cancel */
+                bookingId: number;
             };
             cookie?: never;
         };
         requestBody?: never;
         responses: {
-            /** @description Flight successfully cancelled */
+            /** @description Booking successfully cancelled */
             204: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content?: never;
             };
-            /** @description Invalid email for the booking */
+            /** @description Already cancelled */
             400: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content?: never;
             };
-            /** @description Flight not found */
+            /** @description Not logged in */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Booking not found */
             404: {
                 headers: {
                     [name: string]: unknown;
