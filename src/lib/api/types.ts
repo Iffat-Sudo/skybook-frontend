@@ -4,9 +4,9 @@ type Schemas = components["schemas"];
 
 // Our backend always sends every field of these objects.
 // Swagger marks them as "optional", so we tell TypeScript they are always there.
-type DeepRequired<T> = {
-  [K in keyof T]-?: T[K] extends object ? DeepRequired<T[K]> : T[K];
-};
+type DeepRequired<T> = T extends object
+  ? { [K in keyof T]-?: DeepRequired<NonNullable<T[K]>> }
+  : T;
 
 // Flights and airports
 export type Airport = DeepRequired<Schemas["AirportDTO"]>;
