@@ -15,10 +15,17 @@ type ResultsProps = {
 
 export default function Results({ from, to, date, passengers }: ResultsProps) {
   const { data: airports = [] } = useAirports();
-  const { data: flights = [], isPending, isError, error, refetch } = useFlightSearch({ from, to, date });
+  const {
+    data: flights = [],
+    isPending,
+    isError,
+    error,
+    refetch,
+  } = useFlightSearch({ from, to, date });
 
   // "ARN" → "Stockholm"
-  const cityOf = (code: string) => airports.find((airport) => airport.code === code)?.city ?? code;
+  const cityOf = (code: string) =>
+    airports.find((airport) => airport.code === code)?.city ?? code;
 
   const fromText = from ? cityOf(from) : "Anywhere";
   const toText = to ? cityOf(to) : "Anywhere";
@@ -50,14 +57,20 @@ export default function Results({ from, to, date, passengers }: ResultsProps) {
       {isPending && (
         <div className="space-y-3" aria-label="Loading flights">
           {[1, 2, 3].map((number) => (
-            <div key={number} className="h-24 animate-pulse rounded-lg bg-neutral-200" />
+            <div
+              key={number}
+              className="h-24 animate-pulse rounded-lg bg-neutral-200"
+            />
           ))}
         </div>
       )}
 
       {/* 2. Error */}
       {isError && (
-        <div role="alert" className="space-y-2 rounded-lg bg-error-50 p-6 text-center">
+        <div
+          role="alert"
+          className="space-y-2 rounded-lg bg-error-50 p-6 text-center"
+        >
           <p className="text-h3 text-error-600">Could not load flights</p>
           <p className="text-small text-neutral-600">{error.message}</p>
           <button
@@ -85,7 +98,10 @@ export default function Results({ from, to, date, passengers }: ResultsProps) {
         <ul className="space-y-3">
           {flights.map((flight) => (
             <li key={flight.id}>
-              <FlightResultCard flight={flight} />
+              <FlightResultCard
+                flight={flight}
+                passengers={Number(passengers) || 1}
+              />
             </li>
           ))}
         </ul>

@@ -1,15 +1,18 @@
+import Link from "next/link";
 import type { Flight } from "@/lib/api/types";
 import { formatDate, formatDuration, formatPrice, formatTime } from "@/lib/format";
 
 type FlightResultCardProps = {
   flight: Flight;
+  passengers: number;
 };
 
 const FEW_SEATS = 10;
 
-export default function FlightResultCard({ flight }: FlightResultCardProps) {
+export default function FlightResultCard({ flight, passengers }: FlightResultCardProps) {
   const { departureAirport: from, arrivalAirport: to } = flight;
   const fewSeats = flight.availableSeats < FEW_SEATS;
+  const enoughSeats = flight.availableSeats >= passengers;
 
   return (
     <article className="flex flex-col gap-4 rounded-lg bg-white p-4 shadow-card md:flex-row md:items-center md:justify-between md:p-6">
@@ -35,14 +38,16 @@ export default function FlightResultCard({ flight }: FlightResultCardProps) {
           {fewSeats ? `Only ${flight.availableSeats} seats left` : "Available"}
         </span>
         <p className="text-h3 text-neutral-900">{formatPrice(flight.price)}</p>
-        <button
-          type="button"
-          disabled
-          title="Booking opens in the next version"
-          className="h-10 rounded-lg bg-primary-600 px-5 text-small font-medium text-white disabled:cursor-not-allowed disabled:opacity-60"
-        >
-          Select
-        </button>
+        {enoughSeats ? (
+          <Link
+            href={`/book/${flight.id}?passengers=${passengers}`}
+            className="inline-flex h-10 items-center rounded-lg bg-primary-600 px-5 text-small font-medium text-white hover:bg-primary-700"
+          >
+            Select
+          </Link>
+        ) : (
+          <span className="text-small text-neutral-400">Not enough seats</span>
+        )}
       </div>
     </article>
   );

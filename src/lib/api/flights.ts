@@ -22,3 +22,7 @@ export function searchFlights(params: FlightSearchParams) {
   const queryString = query.toString();
   return apiGet<Flight[]>(`/api/flights/search${queryString ? `?${queryString}` : ""}`);
 }
+
+export function getFlight(flightId: number) {
+  return apiGet<Flight>(`/api/flights/${flightId}`);
+}
