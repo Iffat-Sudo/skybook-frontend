@@ -14,6 +14,8 @@ const priceFormatter = new Intl.NumberFormat("en-IE", {
   currency: "EUR",
 });
 
+const distanceFormatter = new Intl.NumberFormat("en-GB", { maximumFractionDigits: 0 });
+
 // "Fri 17 Apr"
 export function formatDate(value: string) {
   return dateFormatter.format(new Date(value));
@@ -34,4 +36,9 @@ export function formatDuration(start: string, end: string) {
   const minutes = Math.round((new Date(end).getTime() - new Date(start).getTime()) / 60000);
   const hours = Math.floor(minutes / 60);
   return `${hours}h ${minutes % 60}m`;
+}
+
+// "1,987 km"
+export function formatDistance(km: number) {
+  return `${distanceFormatter.format(km)} km`;
 }

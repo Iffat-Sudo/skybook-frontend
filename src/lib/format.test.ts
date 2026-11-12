@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { formatDate, formatDuration, formatPrice, formatTime } from "./format";
+import { formatDate, formatDistance, formatDuration, formatPrice, formatTime } from "./format";
 
 describe("format helpers", () => {
   it("formats a date", () => {
@@ -20,5 +20,9 @@ describe("format helpers", () => {
 
   it("formats a duration", () => {
     expect(formatDuration("2026-11-12T09:00:00", "2026-11-12T11:20:00")).toBe("2h 20m");
+  });
+
+    it("formats a distance", () => {
+    expect(formatDistance(1986.6)).toBe("1,987 km");
   });
 });
