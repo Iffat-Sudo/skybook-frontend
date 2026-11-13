@@ -4,6 +4,7 @@ import FlightResultCard from "@/components/FlightResultCard";
 import SearchForm from "@/components/SearchForm";
 import { useAirports } from "@/hooks/useAirports";
 import { useFlightSearch } from "@/hooks/useFlightSearch";
+import { useLiveFlightStatuses } from "@/hooks/useLiveFlightStatuses";
 import { formatDate } from "@/lib/format";
 
 type ResultsProps = {
@@ -22,6 +23,7 @@ export default function Results({ from, to, date, passengers }: ResultsProps) {
     error,
     refetch,
   } = useFlightSearch({ from, to, date });
+  const { statusOf, isLive } = useLiveFlightStatuses();
 
   // "ARN" → "Stockholm"
   const cityOf = (code: string) =>
@@ -42,6 +44,9 @@ export default function Results({ from, to, date, passengers }: ResultsProps) {
         <p className="text-small text-neutral-600">
           {dateText} · {passengerText}
           {!isPending && !isError && ` · ${foundText}`}
+          {isLive && (
+            <span className="ml-2 font-medium text-success-700">● Live</span>
+          )}
         </p>
       </div>
 
@@ -101,6 +106,7 @@ export default function Results({ from, to, date, passengers }: ResultsProps) {
               <FlightResultCard
                 flight={flight}
                 passengers={Number(passengers) || 1}
+                status={statusOf(flight.id)}
               />
             </li>
           ))}

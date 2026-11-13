@@ -5,6 +5,7 @@ import Link from "next/link";
 import BookingCard from "@/components/BookingCard";
 import { useCancelBooking } from "@/hooks/useCancelBooking";
 import { useMyBookings } from "@/hooks/useMyBookings";
+import { useLiveFlightStatuses } from "@/hooks/useLiveFlightStatuses";
 import { ApiError } from "@/lib/api/client";
 import type { Booking } from "@/lib/api/types";
 import { useAuth } from "@/lib/auth/AuthProvider";
@@ -18,6 +19,7 @@ export default function MyBookings() {
   const { logout } = useAuth();
   const { data: bookings = [], isPending, isError, error, refetch } = useMyBookings();
   const cancel = useCancelBooking();
+    const { statusOf } = useLiveFlightStatuses();
 
   // The token is no longer valid (for example the secret changed): log out.
   // <RequireAuth> then sends the user to the login page.
@@ -95,6 +97,7 @@ export default function MyBookings() {
               <li key={booking.id}>
                 <BookingCard
                   booking={booking}
+                  status={statusOf(booking.flight.id)}
                   onCancel={() => handleCancel(booking)}
                   isCancelling={cancel.isPending && cancel.variables === booking.id}
                 />

@@ -1,5 +1,5 @@
 import { apiGet } from "./client";
-import type { Airport, Flight } from "./types";
+import type { Airport, Flight, FlightStatus } from "./types";
 
 export type FlightSearchParams = {
   from?: string;
@@ -25,4 +25,9 @@ export function searchFlights(params: FlightSearchParams) {
 
 export function getFlight(flightId: number) {
   return apiGet<Flight>(`/api/flights/${flightId}`);
+}
+
+
+export function getFlightStatuses() {
+  return apiGet<FlightStatus[]>("/api/flights/status");
 }

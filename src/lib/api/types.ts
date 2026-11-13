@@ -11,6 +11,7 @@ type DeepRequired<T> = T extends object
 // Flights and airports
 export type Airport = DeepRequired<Schemas["AirportDTO"]>;
 export type Flight = DeepRequired<Schemas["FlightDTO"]>;
+export type FlightStatus = DeepRequired<Schemas["FlightStatusDTO"]>;
 
 // Bookings (Phase 2)
 export type Booking = DeepRequired<Schemas["BookingDTO"]>;

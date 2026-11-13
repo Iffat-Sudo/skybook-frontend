@@ -1,15 +1,17 @@
 import Link from "next/link";
-import type { Flight } from "@/lib/api/types";
+import StatusBadge from "@/components/StatusBadge";
+import type { Flight, FlightStatus } from "@/lib/api/types";
 import { formatDate, formatDuration, formatPrice, formatTime } from "@/lib/format";
 
 type FlightResultCardProps = {
   flight: Flight;
   passengers: number;
+  status?: FlightStatus;
 };
 
 const FEW_SEATS = 10;
 
-export default function FlightResultCard({ flight, passengers }: FlightResultCardProps) {
+export default function FlightResultCard({ flight, passengers, status }: FlightResultCardProps) {
   const { departureAirport: from, arrivalAirport: to } = flight;
   const fewSeats = flight.availableSeats < FEW_SEATS;
   const enoughSeats = flight.availableSeats >= passengers;
@@ -17,12 +19,15 @@ export default function FlightResultCard({ flight, passengers }: FlightResultCar
   return (
     <article className="flex flex-col gap-4 rounded-lg bg-white p-4 shadow-card md:flex-row md:items-center md:justify-between md:p-6">
       <div className="space-y-1">
-        <p className="text-body font-semibold text-neutral-900">
-          {formatTime(flight.departureTime)} → {formatTime(flight.arrivalTime)}
-          <span className="ml-2 text-small font-normal text-neutral-400">
-            {formatDuration(flight.departureTime, flight.arrivalTime)}
-          </span>
-        </p>
+        <div className="flex flex-wrap items-center gap-2">
+          <p className="text-body font-semibold text-neutral-900">
+            {formatTime(flight.departureTime)} → {formatTime(flight.arrivalTime)}
+            <span className="ml-2 text-small font-normal text-neutral-400">
+              {formatDuration(flight.departureTime, flight.arrivalTime)}
+            </span>
+          </p>
+          <StatusBadge status={status} />
+        </div>
         <p className="text-small text-neutral-600">
           {formatDate(flight.departureTime)} · {from.city} ({from.code}) → {to.city} ({to.code}) ·{" "}
           {flight.flightNumber}

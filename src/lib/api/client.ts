@@ -1,4 +1,4 @@
-const API_URL = process.env.NEXT_PUBLIC_API_URL;
+export const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
 // An error with the HTTP status (401, 404, 409...) and a readable message
 export class ApiError extends Error {

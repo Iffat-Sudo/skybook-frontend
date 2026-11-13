@@ -100,6 +100,66 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/flights/{flightId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get one flight
+         * @description Returns one flight by its id
+         */
+        get: operations["getFlight"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/flights/status": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Current status
+         * @description Status of all flights in the next 3 days
+         */
+        get: operations["getStatuses"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/flights/status/stream": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Live updates
+         * @description Server-Sent Events: the server sends a status when it changes
+         */
+        get: operations["streamStatuses"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/flights/search": {
         parameters: {
             query?: never;
@@ -290,6 +350,20 @@ export interface components {
             email: string;
             password: string;
         };
+        FlightStatusDTO: {
+            /** Format: int64 */
+            flightId?: number;
+            flightNumber?: string;
+            status?: string;
+            /** Format: int32 */
+            delayMinutes?: number;
+            /** Format: date-time */
+            expectedDeparture?: string;
+        };
+        SseEmitter: {
+            /** Format: int64 */
+            timeout?: number;
+        };
     };
     responses: never;
     parameters: never;
@@ -435,6 +509,76 @@ export interface operations {
                 };
                 content: {
                     "*/*": components["schemas"]["FlightDTO"][];
+                };
+            };
+        };
+    };
+    getFlight: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description ID of the flight */
+                flightId: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Flight found */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["FlightDTO"];
+                };
+            };
+            /** @description Flight not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    getStatuses: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["FlightStatusDTO"][];
+                };
+            };
+        };
+    };
+    streamStatuses: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "text/event-stream": components["schemas"]["SseEmitter"];
                 };
             };
         };
