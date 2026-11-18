@@ -1,3 +1,6 @@
+"use client";
+
+import { AnimatePresence, motion } from "motion/react";
 import type { FlightStatus } from "@/lib/api/types";
 import { formatTime } from "@/lib/format";
 
@@ -27,8 +30,20 @@ export default function StatusBadge({ status }: { status?: FlightStatus }) {
   const badge = badgeFor(status);
 
   return (
-    <span role="status" className={`rounded-full px-2 py-0.5 text-caption font-medium ${badge.className}`}>
-      {badge.text}
+    // role="status" stays on the outer box, so screen readers read every new status
+    <span role="status" className="inline-flex">
+      <AnimatePresence mode="wait" initial={false}>
+        <motion.span
+          key={badge.text}
+          initial={{ opacity: 0, scale: 0.8 }}
+          animate={{ opacity: 1, scale: 1 }}
+          exit={{ opacity: 0, scale: 0.8 }}
+          transition={{ duration: 0.2 }}
+          className={`rounded-full px-2 py-0.5 text-caption font-medium ${badge.className}`}
+        >
+          {badge.text}
+        </motion.span>
+      </AnimatePresence>
     </span>
   );
 }

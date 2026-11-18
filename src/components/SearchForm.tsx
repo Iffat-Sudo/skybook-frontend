@@ -1,5 +1,6 @@
 "use client";
 
+import { motion } from "motion/react";
 import { useRouter } from "next/navigation";
 import { useState, type FormEvent } from "react";
 import { useAirports } from "@/hooks/useAirports";
@@ -118,12 +119,13 @@ export default function SearchForm({
         </select>
       </label>
 
-      <button
-        type="submit"
+              <motion.button
+          type="submit"
+          whileTap={{ scale: 0.98 }}
         className="h-12 rounded-lg bg-primary-600 px-6 text-small font-medium text-white hover:bg-primary-700"
       >
         Search
-      </button>
+            </motion.button>
     </form>
   );
 }

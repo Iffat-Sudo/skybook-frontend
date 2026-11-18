@@ -1,5 +1,6 @@
 "use client";
 
+import { motion } from "motion/react";
 import FlightResultCard from "@/components/FlightResultCard";
 import SearchForm from "@/components/SearchForm";
 import { useAirports } from "@/hooks/useAirports";
@@ -100,15 +101,16 @@ export default function Results({ from, to, date, passengers }: ResultsProps) {
 
       {/* 4. The list */}
       {flights.length > 0 && (
-        <ul className="space-y-3">
-          {flights.map((flight) => (
-            <li key={flight.id}>
-              <FlightResultCard
-                flight={flight}
-                passengers={Number(passengers) || 1}
-                status={statusOf(flight.id)}
-              />
-            </li>
+                <ul className="space-y-3">
+          {flights.map((flight, index) => (
+                        <motion.li
+              key={flight.id}
+              initial={{ opacity: 0, y: 24 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.4, delay: Math.min(index, 10) * 0.08 }}
+            >
+              <FlightResultCard flight={flight} passengers={Number(passengers) || 1} status={statusOf(flight.id)} />
+            </motion.li>
           ))}
         </ul>
       )}

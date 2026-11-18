@@ -1,5 +1,6 @@
 "use client";
 
+import { motion } from "motion/react";
 import { useEffect, useState, type FormEvent } from "react";
 import Link from "next/link";
 import { useBookFlight } from "@/hooks/useBookFlight";
@@ -116,30 +117,30 @@ export default function BookingFlow({
 
   const { departureAirport: from, arrivalAirport: to } = flight;
 
-  // 3. Booking done
+   // 3. Booking done
   if (booking.isSuccess) {
     const count = booking.data.length;
     return (
-      <div className="space-y-4 rounded-lg bg-white p-6 text-center shadow-card">
+      <motion.div
+        initial={{ opacity: 0, scale: 0.95 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ duration: 0.3, ease: "easeOut" }}
+        className="space-y-4 rounded-lg bg-white p-6 text-center shadow-card"
+      >
         <p className="text-h2 text-success-700">Booking confirmed!</p>
         <p className="text-body text-neutral-600">
-          You booked {count} {count === 1 ? "seat" : "seats"} on{" "}
-          {flight.flightNumber}, {from.city} → {to.city},{" "}
-          {formatDate(flight.departureTime)} at{" "}
-          {formatTime(flight.departureTime)}.
+          You booked {count} {count === 1 ? "seat" : "seats"} on {flight.flightNumber}, {from.city} →{" "}
+          {to.city}, {formatDate(flight.departureTime)} at {formatTime(flight.departureTime)}.
         </p>
         <div className="flex flex-col justify-center gap-3 sm:flex-row">
-          <Link
-            href="/bookings"
-            className={`${primaryButtonClass} inline-flex items-center justify-center`}
-          >
+          <Link href="/bookings" className={`${primaryButtonClass} inline-flex items-center justify-center`}>
             See my bookings
           </Link>
           <Link href="/" className={secondaryButtonClass}>
             Search more flights
           </Link>
         </div>
-      </div>
+      </motion.div>
     );
   }
 
@@ -258,15 +259,16 @@ export default function BookingFlow({
           </p>
         )}
 
-        <button
+               <motion.button
           type="submit"
+          whileTap={{ scale: 0.98 }}
           disabled={!canBook || booking.isPending}
           className={`${primaryButtonClass} w-full`}
         >
           {booking.isPending
             ? "Booking..."
             : `Book now · ${formatPrice(total)}`}
-        </button>
+              </motion.button>
       </form>
     </div>
   );

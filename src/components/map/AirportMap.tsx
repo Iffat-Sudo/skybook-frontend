@@ -2,14 +2,9 @@
 
 import "leaflet/dist/leaflet.css";
 import Link from "next/link";
-import {
-  CircleMarker,
-  MapContainer,
-  Polyline,
-  Popup,
-  TileLayer,
-  Tooltip,
-} from "react-leaflet";
+import { useMemo } from "react";
+import { CircleMarker, MapContainer, Polyline, Popup, TileLayer, Tooltip } from "react-leaflet";
+import FlyingPlane from "./FlyingPlane";
 import type { Airport } from "@/lib/api/types";
 import { curvedPath } from "@/lib/geo";
 
@@ -19,19 +14,19 @@ const PRIMARY_DARK = "#1E3A8A"; // primary-900
 
 type AirportMapProps = {
   airports: Airport[];
-  route?: { from: Airport; to: Airport }; // show only this route, with a curved line
+  route?: { from: Airport; to: Airport }; // show only this route, with a curved line and a plane
   className?: string;
 };
 
-export default function AirportMap({
-  airports,
-  route,
-  className = "h-80",
-}: AirportMapProps) {
-  const shown = route ? [route.from, route.to] : airports;
-  const bounds = shown.map(
-    (airport) => [airport.latitude, airport.longitude] as [number, number],
-  );
+export default function AirportMap({ airports, route, className = "h-80" }: AirportMapProps) {
+  const from = route?.from;
+  const to = route?.to;
+
+  // Calculate the curve only when the airports change (not on every key press in the form)
+  const path = useMemo(() => (from && to ? curvedPath(from, to) : null), [from, to]);
+
+  const shown = from && to ? [from, to] : airports;
+  const bounds = shown.map((airport) => [airport.latitude, airport.longitude] as [number, number]);
 
   return (
     <MapContainer
@@ -45,11 +40,11 @@ export default function AirportMap({
         url="https://tile.openstreetmap.org/{z}/{x}/{y}.png"
       />
 
-      {route && (
-        <Polyline
-          positions={curvedPath(route.from, route.to)}
-          pathOptions={{ color: PRIMARY, weight: 3, dashArray: "6 8" }}
-        />
+      {path && (
+        <>
+          <Polyline positions={path} pathOptions={{ color: PRIMARY, weight: 3, dashArray: "6 8" }} />
+          <FlyingPlane path={path} />
+        </>
       )}
 
       {shown.map((airport) => (
@@ -57,12 +52,7 @@ export default function AirportMap({
           key={airport.code}
           center={[airport.latitude, airport.longitude]}
           radius={route ? 8 : 6}
-          pathOptions={{
-            color: "#FFFFFF",
-            weight: 2,
-            fillColor: route ? PRIMARY_DARK : PRIMARY,
-            fillOpacity: 1,
-          }}
+          pathOptions={{ color: "#FFFFFF", weight: 2, fillColor: route ? PRIMARY_DARK : PRIMARY, fillOpacity: 1 }}
         >
           {route ? (
             <Tooltip permanent direction="top" offset={[0, -8]}>
@@ -74,9 +64,7 @@ export default function AirportMap({
                 {airport.city} ({airport.code})
               </p>
               <p>{airport.name}</p>
-              <Link href={`/results?from=${airport.code}&passengers=1`}>
-                Flights from {airport.city} →
-              </Link>
+              <Link href={`/results?from=${airport.code}&passengers=1`}>Flights from {airport.city} →</Link>
             </Popup>
           )}
         </CircleMarker>
