@@ -2,6 +2,10 @@
 
 A full-stack portfolio project: a Next.js frontend for my Spring Boot Flight Booking API. Search flights on a map, follow live flight status, book seats, and manage your bookings.
 
+<img width="1671" height="780" alt="result" src="https://github.com/user-attachments/assets/b37d8c1a-1980-4fca-b53a-54c71b3bff6c" />
+
+<img width="1878" height="795" alt="booking" src="https://github.com/user-attachments/assets/3f36cab4-db52-40dc-aed6-10b8b81e7dc8" />
+
 **🌐 Live demo:** https://skybook-frontend.vercel.app
 
 **📖 API docs (Swagger):** https://skybook-api-iub9.onrender.com/swagger-ui.html
